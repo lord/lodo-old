@@ -50,10 +50,10 @@ namespace pongGame {
   }
 
   void game_update(int time) {
-    if (gameMode == _playingMode) {
+    // if (gameMode == _playingMode) {
       update_players();
       update_ball();
-    }
+    // } else if ()
   }
 
   void game_draw(int time) {
