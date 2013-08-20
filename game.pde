@@ -173,9 +173,9 @@ namespace pongGame {
 
     // reset if behind a player
     if (ball_x < 0) {
-      gameMode = _player2WinMode;
+      reset_ball();
     } else if (ball_x > _boardWidth) {
-      gameMode = _player1WinMode;
+      reset_ball();
     }
 
     // bounce off walls
