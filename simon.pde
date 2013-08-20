@@ -46,7 +46,6 @@ namespace simonGame {
   unsigned long simTime_wSeq_step  = 0;
   unsigned long simTime_wGame = 0;
   unsigned long simTime_lGame = 0;
-  unsigned long simTime_updatePoll = 0;
 
   //Simon Variables
   int sim_seq[16][2]={{0,0},{0,1},{1,1},{2,1},{3,0},{3,1},{3,0},{2,1},{1,1},{1,2},{0,2},{1,2},{2,3},{3,3},{2,2},{1,1}};
@@ -119,13 +118,13 @@ namespace simonGame {
   const byte _drawPallette = 1;
   const byte _drawArrow = 2;
 
+  void game_boot() {
+
+  }
+
   void update(){
     switch (sim_state) {
-      case _simState_intro: // Play Introduction 
-        if (_stateMDebug){ Serial.println("Intro"); }
-        process_intro();
-         break;
-      case _simState_seq: // Play Sequence
+     case _simState_seq: // Play Sequence
         if (_stateMDebug){ Serial.println("Intro"); }
         process_seq();
         break;
@@ -156,26 +155,15 @@ namespace simonGame {
     }
   }
 
-  void init_intro(){
+  void simon_reset(){
     if (_functionDebug) { Serial.println("Enter Init_intro"); }
-    sim_state=_simState_intro;
-    simTime_intro = currentTime + _simTimeout_intro;
+    sim_state=_simState_seq;
     sim_currentUserStep = 0;
     sim_roundStep = 0;
     sim_misses = 0;
     generate_sequence();
-    sim_intro_type = ++sim_intro_type % 2;
   }
 
-  void process_intro(){
-    if (currentTime >= simTime_intro && numberSquaresPressed()>0){ // wait until someone touches it
-      init_wait();
-    }
-  }
-    
-  void draw_intro(){
-  }
-    
   void generate_sequence(){
     randomSeed(long(currentTime));
     int row = int(mrandom(0,3));
@@ -316,25 +304,12 @@ namespace simonGame {
     const char rs[] = {'.','>','^','<','_','-','|','X'};
     Serial.println("");
     Serial.print("Arrow"); Serial.println();
-    Serial.print(rs[arrow[0][0]]);
-    Serial.print(rs[arrow[0][1]]);
-    Serial.print(rs[arrow[0][2]]);
-    Serial.print(rs[arrow[0][3]]);Serial.println();
-
-    Serial.print(rs[arrow[1][0]]);
-    Serial.print(rs[arrow[1][1]]);
-    Serial.print(rs[arrow[1][2]]);
-    Serial.print(rs[arrow[1][3]]);Serial.println();
-
-    Serial.print(rs[arrow[2][0]]);
-    Serial.print(rs[arrow[2][1]]);
-    Serial.print(rs[arrow[2][2]]);
-    Serial.print(rs[arrow[2][3]]);Serial.println();
-
-    Serial.print(rs[arrow[3][0]]);
-    Serial.print(rs[arrow[3][1]]);
-    Serial.print(rs[arrow[3][2]]);
-    Serial.print(rs[arrow[3][3]]);Serial.println();
+    for (int i=0; i<4; i++){
+      for (int j=0; j<4; j++){
+        Serial.print(rs[arrow[i][j]]);
+      }
+      Serial.println();
+    }
   }
 
   void init_uGood(){

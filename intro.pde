@@ -9,7 +9,7 @@ void fire(){
 	if (time<=20000) { 
 		intensity = time/100;
 	} else {
-		intensity = (20000-time)/200;
+		intensity = (20000-time)/100;
 	}
 	intensity = max(10,intensity);
 	int r=0; int g=0; int b=0;
