@@ -5,32 +5,31 @@
 const boolean debug = 0;
 const boolean outputSensors = 0;
 const boolean _functionDebug = 0;
-//const boolean _stepDebug = 0;
-//const boolean _sequenceDebug = 0;b`
-//const boolean _arrowDebug = 0;
 const boolean _stateMDebug = 0;
 const boolean _checkBoard = 0;
 
-const int squares = 16;
-
 // width of the whole board in pixels, minus one since it's the outer bound
 const int _boardWidth = 19; 
+const int squares = 16;
 
 const int _sensorThreshold = 800;
 
-unsigned long displayTime = 0;
-unsigned long currentTime = 0;
-const unsigned long _sim_updatePoll = 33;
-const unsigned long _sim_drawPoll = 10;
-unsigned long sim_updateTime = 0;
-unsigned long simTime_updatePoll = 0;
+const unsigned long _lodo_updatePoll = 33;
+const unsigned long _lodo_drawPoll = 10;
 
-byte state[4][4];
-byte stateLast[4][4];
 const byte _up = 0;
 const byte _down = 1;
 const byte _pressed = 2;
 const byte _released = 3;
+
+unsigned long displayTime = 0;
+unsigned long currentTime = 0;
+unsigned long lodo_updateTime = 0;
+unsigned long lodo_lastPressureTime = 0; // the last time someone stepped on the board.
+const unsigned long _lodo_lastPressureTimeout = 1000;
+
+byte state[4][4];
+byte stateLast[4][4];
 
 int sensors[2][16];
 byte pallette[20][20][3];
@@ -69,6 +68,9 @@ void updateBoard(){
       if (state[i][j] == _down && (stateLast[i][j] == _up || stateLast[i][j]==_released)) { state[i][j]=_pressed; }
       if (state[i][j] == _up && (stateLast[i][j] == _down || stateLast[i][j]==_pressed)) { state[i][j]=_released; }
     }
+  }
+  if (numberSquaresDownOrPressed()>0){
+    lodo_lastPressureTime = currentTime;
   }  
 }
 

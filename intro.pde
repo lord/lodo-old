@@ -2,15 +2,23 @@
 #include <TCL.h>
 #include <math.h>
 
-void drawFire(){
-	int color = 0; int change = 0;
+void fire(){
+	int color = 0; int change = 0; 
+	int time = currentTime%32000;
+	int intensity;
+	if (time<=20000) { 
+		intensity = time/100;
+	} else {
+		intensity = (20000-time)/200;
+	}
+	intensity = max(10,intensity);
 	int r=0; int g=0; int b=0;
 	for (int i=0; i<20; i++){
 	    for (int j=0; j<20; j++){
 		    change = random(0,10);
 		    if (change > 5) {
-		        r = random(0,255);
-		        g = random(0,r);
+		        r = random(0,intensity);
+		        g = random(0,int(r/2));
 		        set_pixel(i,j,r,g,0);
 	        }
 	    }
@@ -24,7 +32,7 @@ void drawFire(){
     if (_functionDebug) { Serial.println("Entering Step"); }
     for (int row=0; row<4; row++){
       for (int col=0; col<4; col++){
-        int r = random(300);
+        int r = random(3000);
         int g = random(300);
         int b = random(300);
         if (r < 200){
@@ -39,25 +47,32 @@ void drawFire(){
   }
 
 
-void pixelate(){
+void pixellate(){
 if (_functionDebug) { Serial.println("Entering Pixelate"); }
-	for (int row=0; row<19; row++){
-		for (int col=0; col<19; col++){
-		    int r = random(300);
-		    int g = random(300);
-		    int b = random(300);
-		    if (r < 255){
-				set_pixel(row*5+i, col*5+j,r,g,b);
-			} else {
-				set_pixel(row*5+i, col*5+j,0,0,0);
-			}
+	for (int row=0; row<20; row++){
+		for (int col=0; col<20; col++){
+		    int type = random(10);
+		    switch (type){
+		    	case 0: set_pixel(row,col,0,0,0); break;
+		    	case 1: set_pixel(row,col,255,0,0); break;
+		    	case 2: set_pixel(row,col,0,255,0); break;
+		    	case 3: set_pixel(row,col,0,0,255); break;
+		    	case 4: set_pixel(row,col,0,128,255); break;
+		    	case 5: set_pixel(row,col,128,0,255); break;
+		    	case 6: set_pixel(row,col,0,0,0); break;
+		    	case 7: set_pixel(row,col,255,255,0); break;
+		    	case 8: set_pixel(row,col,0,255,255); break;
+		    	case 9: set_pixel(row,col,255,0,255); break;
+		    	default: set_pixel(row,col,0,0,0); break;
+	    	}
 		}
 	}
 }
 
 
-  void d_wrap(int dist, int fg, int bg){
-/*    d_square(0,0,20,bg);
+  void wrap(){
+  	int dist = (currentTime/6)%400;
+    draw_all(0,0,0);
     int dir = 2;  // 1 left; 2 up; 3 right; 4 down
     int row = -1; int col = 0;
     int layer = 0; // layer pixel to the center 
@@ -75,8 +90,8 @@ if (_functionDebug) { Serial.println("Entering Pixelate"); }
         col--;
         if (col <= 1+layer) { dir=2; layer++; }
       }
-      d_setPixel(row,col,fg);
-    }*/
+      set_pixel(row,col,255,255,255);
+    }
   }
 
 
