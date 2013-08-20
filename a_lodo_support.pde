@@ -1,7 +1,7 @@
 ////////////////////////////
 // LODO SUPPORT FUNCTIONS //
 ////////////////////////////
-
+#include <stdio.h>
 const float _pi = 3.1416;
 
 void draw_square(int x, int y, int r, int g, int b) {
@@ -36,7 +36,7 @@ float point_distance(float x1,float y1,float x2,float y2) {
 
 // checks if x2, y2 is in the box
 bool point_in_box(float x1, float y1, float w1, float h1, float x2, float y2) {
-  if (x2 > x1 and x2 < x1+w1 and y2 > y1 and y2 < y1+h1) {
+  if (x2 > x1 && x2 < x1+w1 && y2 > y1 && y2 < y1+h1) {
     return true;
   } else {
     return false;
@@ -51,7 +51,7 @@ void set_pixel_square(int sq_x, int sq_y, int x, int y, int r, int g, int b) {
 
 // set a pixel with the specified global x and y
 void set_pixel(int x, int y, int r, int g, int b) {
-  if (x <= _boardWidth and y <= _boardWidth and x >= 0 and y >= 0) {
+  if (x <= _boardWidth && y <= _boardWidth && x >= 0 && y >= 0) {
     pallette[x][y][0] = r;
     pallette[x][y][1] = g;
     pallette[x][y][2] = b;
@@ -59,7 +59,7 @@ void set_pixel(int x, int y, int r, int g, int b) {
 }
 
 void set_pixel_alpha(int x, int y, int r, int g, int b, float alpha) {
-  if (x <= _boardWidth and y <= _boardWidth and x >= 0 and y >= 0 and alpha > 0) {
+  if (x <= _boardWidth && y <= _boardWidth && x >= 0 && y >= 0 && alpha > 0) {
     if (alpha > 1) {alpha = 1;}
     pallette[x][y][0] += (int) ((r - pallette[x][y][0]) * alpha);
     pallette[x][y][1] += (int) ((g - pallette[x][y][1]) * alpha);
@@ -72,3 +72,51 @@ int mrandom(int low, int high){
   while (num>high || num <low){ num = random(-10,10); }
   return num;
 }
+
+void printText(){
+  char s[] = "Robert Lord pong master";
+  unsigned long c1 = (currentTime/500) % 50;
+  int offset = -int(c1);
+  int i = 0;
+  while (s[i] != 0){
+    printChar(19,offset+i*4+20,0,0,20,20,s[i],0,255,255,255);  
+    i++;
+  }
+}
+
+int numberSquaresPressed(){
+  int count=0;
+  for (int i=0; i<4; i++){
+    for (int j=0; j<4; j++){
+       if (state[i][j] == _pressed) {
+           count++;
+       }
+    }
+  }
+  return count; 
+}
+
+int numberSquaresDown(){
+  int count=0;
+  for (int i=0; i<4; i++){
+    for (int j=0; j<4; j++){
+       if (state[i][j] == _down) {
+           count++;
+       }
+    }
+  }
+  return count; 
+}
+
+int numberSquaresDownOrPressed(){
+    int count=0;
+    for (int i=0; i<4; i++){
+      for (int j=0; j<4; j++){
+         if (state[i][j] == _down || state[i][j] == _pressed) {
+             count++;
+         }
+      }
+    }
+    return count;
+  }
+

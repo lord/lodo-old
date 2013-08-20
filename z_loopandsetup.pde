@@ -19,7 +19,6 @@ void setup() {
   pinMode(4, OUTPUT);
   digitalWrite(4,LOW);
   pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
   Serial.begin(9600);
   randomSeed(analogRead(4)); // setup for a different stating point for the random number 
   pongGame::game_boot();
@@ -29,6 +28,7 @@ void loop() {
   currentTime = millis();
   if (currentTime >= displayTime) {
     pongGame::game_draw(currentTime - displayTime);
+ //   printText();
     printLights();
     displayTime = currentTime + _sim_drawPoll;
   }
@@ -38,3 +38,4 @@ void loop() {
     sim_updateTime = currentTime + _sim_updatePoll;
   } 
 }
+

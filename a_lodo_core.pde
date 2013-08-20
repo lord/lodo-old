@@ -5,9 +5,9 @@
 const boolean debug = 0;
 const boolean outputSensors = 0;
 const boolean _functionDebug = 0;
-const boolean _stepDebug = 0;
-const boolean _sequenceDebug = 0;
-const boolean _arrowDebug = 0;
+//const boolean _stepDebug = 0;
+//const boolean _sequenceDebug = 0;b`
+//const boolean _arrowDebug = 0;
 const boolean _stateMDebug = 0;
 const boolean _checkBoard = 0;
 
@@ -16,45 +16,24 @@ const int squares = 16;
 // width of the whole board in pixels, minus one since it's the outer bound
 const int _boardWidth = 19; 
 
-const int sensorThreshold = 800;
+const int _sensorThreshold = 800;
 
 unsigned long displayTime = 0;
 unsigned long currentTime = 0;
 const unsigned long _sim_updatePoll = 33;
 const unsigned long _sim_drawPoll = 10;
 unsigned long sim_updateTime = 0;
+unsigned long simTime_updatePoll = 0;
 
-int state[4][4];
-int stateLast[4][4];
-const int _up = 0;
-const int _down = 1;
-const int _pressed = 2;
-const int _released = 3;
+byte state[4][4];
+byte stateLast[4][4];
+const byte _up = 0;
+const byte _down = 1;
+const byte _pressed = 2;
+const byte _released = 3;
 
 int sensors[2][16];
-
 byte pallette[20][20][3];
-
-int bConfig[16][3]={
-  {0,0,0},
-  {0,1,0},
-  {0,2,0},
-  {0,3,0},
-  {1,3,0},
-  {1,2,0},
-  {1,1,0},
-  {1,0,0},
-  {2,0,0},
-  {2,1,0},
-  {2,2,1},
-  {2,3,0},
-  {3,3,0},
-  {3,2,0},
-  {3,1,0},
-  {3,0,0}
-};
-
-unsigned long simTime_updatePoll = 0;
 
 // 
 // updates the board
@@ -66,25 +45,25 @@ void updateBoard(){
     }
   }
   updateSensors();
-  if (sensors[0][14] > sensorThreshold || sensors[0][15] > sensorThreshold) { state[0][0]=_down; } else { state[0][0] = _up; }
-  if (sensors[0][10] > sensorThreshold || sensors[0][11] > sensorThreshold ) { state[0][1]=_down; } else { state[0][1] = _up; }
-  if (sensors[0][6] > sensorThreshold || sensors[0][7] > sensorThreshold ) { state[0][2]=_down; } else { state[0][2] = _up; }
-  if (sensors[0][2] > sensorThreshold || sensors[0][3] > sensorThreshold ) { state[0][3]=_down; } else { state[0][3] = _up; }
+  if (sensors[0][14] > _sensorThreshold || sensors[0][15] > _sensorThreshold) { state[0][0]=_down; } else { state[0][0] = _up; }
+  if (sensors[0][10] > _sensorThreshold || sensors[0][11] > _sensorThreshold ) { state[0][1]=_down; } else { state[0][1] = _up; }
+  if (sensors[0][6] > _sensorThreshold || sensors[0][7] > _sensorThreshold ) { state[0][2]=_down; } else { state[0][2] = _up; }
+  if (sensors[0][2] > _sensorThreshold || sensors[0][3] > _sensorThreshold ) { state[0][3]=_down; } else { state[0][3] = _up; }
 
-  if (sensors[0][0] > sensorThreshold || sensors[0][1] > sensorThreshold ) { state[1][0]=_down; } else { state[1][0] = _up; }
-  if (sensors[0][4] > sensorThreshold || sensors[0][5] > sensorThreshold ) { state[1][1]=_down; } else { state[1][1] = _up; }
-  if (sensors[0][8] > sensorThreshold || sensors[0][9] > sensorThreshold ) { state[1][2]=_down; } else { state[1][2] = _up; }
-  if (sensors[0][12] > sensorThreshold || sensors[0][13] > sensorThreshold ) { state[1][3]=_down; } else { state[1][3] = _up; }
+  if (sensors[0][0] > _sensorThreshold || sensors[0][1] > _sensorThreshold ) { state[1][0]=_down; } else { state[1][0] = _up; }
+  if (sensors[0][4] > _sensorThreshold || sensors[0][5] > _sensorThreshold ) { state[1][1]=_down; } else { state[1][1] = _up; }
+  if (sensors[0][8] > _sensorThreshold || sensors[0][9] > _sensorThreshold ) { state[1][2]=_down; } else { state[1][2] = _up; }
+  if (sensors[0][12] > _sensorThreshold || sensors[0][13] > _sensorThreshold ) { state[1][3]=_down; } else { state[1][3] = _up; }
 
-  if (sensors[1][14] > sensorThreshold || sensors[1][15] > sensorThreshold ) { state[2][0]=_down; } else { state[2][0] = _up; } 
-  if (sensors[1][10] > sensorThreshold || sensors[1][11] > sensorThreshold ) { state[2][1]=_down; } else { state[2][1] = _up; }
-  if (sensors[1][6] > sensorThreshold || sensors[1][7] > sensorThreshold ) { state[2][2]=_down; } else { state[2][2] = _up; }
-  if (sensors[1][2] > sensorThreshold || sensors[1][3] > sensorThreshold ) { state[2][3]=_down; } else { state[2][3] = _up; }
+  if (sensors[1][14] > _sensorThreshold || sensors[1][15] > _sensorThreshold ) { state[2][0]=_down; } else { state[2][0] = _up; } 
+  if (sensors[1][10] > _sensorThreshold || sensors[1][11] > _sensorThreshold ) { state[2][1]=_down; } else { state[2][1] = _up; }
+  if (sensors[1][6] > _sensorThreshold || sensors[1][7] > _sensorThreshold ) { state[2][2]=_down; } else { state[2][2] = _up; }
+  if (sensors[1][2] > _sensorThreshold || sensors[1][3] > _sensorThreshold ) { state[2][3]=_down; } else { state[2][3] = _up; }
 
-  if (sensors[1][0] > sensorThreshold || sensors[1][1] > sensorThreshold ) { state[3][0]=_down; } else { state[3][0] = _up; }
-  if (sensors[1][4] > sensorThreshold || sensors[1][5] > sensorThreshold ) { state[3][1]=_down; } else { state[3][1] = _up; }
-  if (sensors[1][8] > sensorThreshold || sensors[1][9] > sensorThreshold ) { state[3][2]=_down; } else { state[3][2] = _up; }
-  if (sensors[1][12] > sensorThreshold || sensors[1][13] > sensorThreshold ) { state[3][3]=_down; } else { state[3][3] = _up; }   
+  if (sensors[1][0] > _sensorThreshold || sensors[1][1] > _sensorThreshold ) { state[3][0]=_down; } else { state[3][0] = _up; }
+  if (sensors[1][4] > _sensorThreshold || sensors[1][5] > _sensorThreshold ) { state[3][1]=_down; } else { state[3][1] = _up; }
+  if (sensors[1][8] > _sensorThreshold || sensors[1][9] > _sensorThreshold ) { state[3][2]=_down; } else { state[3][2] = _up; }
+  if (sensors[1][12] > _sensorThreshold || sensors[1][13] > _sensorThreshold ) { state[3][3]=_down; } else { state[3][3] = _up; }   
   for (int i=0; i<4; i++){
     for (int j=0; j<4; j++){
       if (state[i][j] == _down && (stateLast[i][j] == _up || stateLast[i][j]==_released)) { state[i][j]=_pressed; }
@@ -116,8 +95,6 @@ void updateSensors(){
   sensors[0][15]=readSensorA(HIGH, HIGH, HIGH, HIGH); sensors[1][15]=readSensorB(HIGH, HIGH, HIGH, HIGH);
   if (outputSensors) { printSensors(); }
 }  
-
-
 
 void printSensors(){
   for (int i=0; i<16; i++){
@@ -160,44 +137,38 @@ int readSensorB(byte p3, byte p2, byte p1, byte p0){
 void printLights(){
 //  if (debug) { Serial.println("Entering printLights"); }
   TCL.sendEmptyFrame();
+  int row = 0; int col=0;
   for (int square = 0; square<16; square++){
-    int row = bConfig[square][0];
-    int col = bConfig[square][1];
-    int type = bConfig[square][2];
-    if (type == 0) {
-      printSquare0(row, col);
-    } else {
-      printSquare1(row, col);
+    row = square/4;
+    col = square % 4;
+    if (row == 1 or row==3){ // rows 1 & 3 go backwards
+      col = 3 - col;
     }
+    printSquare(row, col);
   }
   TCL.sendEmptyFrame();
 }
 
-void printSquare0(int row, int col){
-  for (int l=0;l<5;l++) {printPixel(row*5+0,col*5+l);}
-  for (int l=4;l>=0;l--){printPixel(row*5+1,col*5+l);}
-  for (int l=0;l<5;l++) {printPixel(row*5+2,col*5+l);}
-  for (int l=4;l>=0;l--){printPixel(row*5+3,col*5+l);}
-  for (int l=0;l<5;l++) {printPixel(row*5+4,col*5+l);}
-}
-  
-void printSquare1(int row, int col){
-  for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+0);}
-  for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+1);}
-  for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+2);}
-  for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+3);}
-  for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+4);}
+void printSquare(int row, int col){
+  if (row==2 and col==2) { // accomodate bad wiring on 2,2
+    for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+0);}
+    for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+1);}
+    for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+2);}
+    for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+3);}
+    for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+4);}
+  } else {
+    for (int l=0;l<5;l++) {printPixel(row*5+0,col*5+l);}
+    for (int l=4;l>=0;l--){printPixel(row*5+1,col*5+l);}
+    for (int l=0;l<5;l++) {printPixel(row*5+2,col*5+l);}
+    for (int l=4;l>=0;l--){printPixel(row*5+3,col*5+l);}
+    for (int l=0;l<5;l++) {printPixel(row*5+4,col*5+l);}
+  }
 }
 
 void printPixel(int pRow, int pCol){
-//  if (debug) { Serial.println("Entering printPixel"); }
-
-  int r = pallette[pRow][pCol][0];
-  int g = pallette[pRow][pCol][1];
-  int b = pallette[pRow][pCol][2];
-//  if (debug) {     Serial.print(r); Serial.print('\t'); Serial.print(g); Serial.print('\t'); Serial.println(b);  }
-
-  TCL.sendColor(r,g,b);
+  TCL.sendColor(pallette[pRow][pCol][0],
+                pallette[pRow][pCol][1],
+                pallette[pRow][pCol][2]);
 }
 
 
