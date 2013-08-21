@@ -1,3 +1,31 @@
+void drawCurrentGame() {
+  switch (currentGame) {
+    case _gameSelector:
+      gameSelector::game_draw();
+      break;
+    case _simonGame:
+      //gameSelector::game_draw();
+      break;
+    case _pongGame:
+      pongGame::game_draw();
+      break;
+  }
+}
+
+void updateCurrentGame() {
+  switch (currentGame) {
+    case _gameSelector:
+      gameSelector::game_update();
+      break;
+    case _simonGame:
+      //gameSelector::game_draw();
+      break;
+    case _pongGame:
+      pongGame::game_update();
+      break;
+  }
+}
+
 void setup() {
   TCL.begin();
   for (int i=0; i<4; i++){
@@ -21,21 +49,20 @@ void setup() {
   pinMode(5, OUTPUT);
   Serial.begin(9600);
   randomSeed(analogRead(4)); // setup for a different starting point for the random number 
-  pongGame::game_boot();
+
+  gameSelector::game_boot();
 }
 
 void loop() {
   currentTime = millis();
   if (currentTime >= displayTime) {
-    fire();
- //   pongGame::game_draw(currentTime - displayTime);
- //   printText();
+    drawCurrentGame();
     printLights();
     displayTime = currentTime + _lodo_drawPoll;
   }
   if (currentTime >= lodo_updateTime) {
     updateBoard();
-    pongGame::game_update(currentTime - lodo_updateTime);
+    updateCurrentGame();
     lodo_updateTime = currentTime + _lodo_updatePoll;
   } 
 }

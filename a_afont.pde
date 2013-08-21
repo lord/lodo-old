@@ -7,8 +7,7 @@
 // The character will be clipped to X0/X1 & Y0/Y1
 // The background is not colored
 //
-void printChar(int x, int y, int x0, int y0, int x1, int y1, 
-    char c,  int orient, int r, int g, int b){ 
+void printChar(int x, int y, char c, int r, int g, int b){ 
 
   int charIndex = 0;
   if (c>='0' and c<='9'){

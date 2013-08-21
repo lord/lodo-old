@@ -34,6 +34,11 @@ byte stateLast[4][4];
 int sensors[2][16];
 byte pallette[20][20][3];
 
+const byte _gameSelector = 0;
+const byte _simonGame = 1;
+const byte _pongGame = 2;
+byte currentGame = _gameSelector;
+
 // 
 // updates the board
 //
