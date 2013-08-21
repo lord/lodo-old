@@ -152,7 +152,7 @@ void printLights(){
 }
 
 void printSquare(int row, int col){
-  if (row==2 and col==2) { // accomodate bad wiring on 2,2
+  if (row==2 and col==2) { // accommodate bad wiring on 2,2
     for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+0);}
     for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+1);}
     for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+2);}
