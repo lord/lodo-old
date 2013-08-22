@@ -4,7 +4,7 @@ void drawCurrentGame() {
       gameSelector::game_draw();
       break;
     case _simonGame:
-      //gameSelector::game_draw();
+      // do nothing, draw in update
       break;
     case _pongGame:
       pongGame::game_draw();
@@ -18,7 +18,7 @@ void updateCurrentGame() {
       gameSelector::game_update();
       break;
     case _simonGame:
-      //gameSelector::game_draw();
+      simon::game_update();
       break;
     case _pongGame:
       pongGame::game_update();
@@ -58,6 +58,7 @@ void loop() {
     updateBoard();
     updateCurrentGame();
     lodo_updateTime = currentTime + _lodo_updatePoll;
+    drawCurrentGame();
     printLights();
   } 
 }

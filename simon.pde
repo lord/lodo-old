@@ -110,7 +110,7 @@ namespace simon {
     simon_reset();
   }
 
-  void gameUpdate(){
+  void game_update(){
     switch (sim_state) {
      case _simState_seq: // Play Sequence
         if (_stateMDebug){ Serial.println("Intro"); }

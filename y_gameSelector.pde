@@ -60,6 +60,10 @@ namespace gameSelector {
           currentGame = _pongGame;
           pongGame::game_boot();
         }
+        if (state[2][1] == _down) {
+          currentGame = _simonGame;
+          simon::game_boot();
+        }
       break;
     }
   }
@@ -78,6 +82,7 @@ namespace gameSelector {
       case _mode_selecting:
         draw_logo();
         draw_square(2,2,150,0,0);
+        draw_square(2,1,0,150,0);
       break;
     }
   }
