@@ -37,29 +37,32 @@ namespace simon {
   unsigned long sim_endTime = 0;
   const unsigned long _sim_seqStepDuration = 1000; // how long to display each sequare
   const unsigned long _sim_badSquareDuration = 1000; // how long to display a mistep
-  const unsigned long _sim_winGameDuration = 1000;
-  const unsigned long _sim_loseGameDuration = 1000;
+  const unsigned long _sim_winGameDuration = 15000;
+  const unsigned long _sim_loseGameDuration = 6000;
   const unsigned long _sim_winSeqDuration = 1000;
+  const unsigned long _sim_introDuration = 10000;
 
   //Simon Variables
   byte sim_seq[16][2]={{0,0},{0,1},{1,1},{2,1},{3,0},{3,1},{3,0},{2,1},{1,1},{1,2},{0,2},{1,2},{2,3},{3,3},{2,2},{1,1}};
-  byte sim_roundStep = 10; // how many steps user has right.
+  byte sim_roundStep = 0; // how many steps user has right for this round.
 
   byte sim_currentStep = 0;
   byte sim_maxStep = 8;
   byte sim_state = 0;
   byte sim_currentUserStep = 0;
   byte sim_misses = 0;
-  const int _sim_maxMisses = 3;
+  const byte _sim_maxMisses = 3;
   byte badRow = 0;
   byte badCol = 0;
 
 
   void update();
   void generate_sequence();
+  void init_intro();
+  void process_intro();
+  void setSequence();
   void init_seq();
   void process_seq();
-  void setSequence();
   void init_wait();
   void process_wait();
   void printArrow();
@@ -111,7 +114,12 @@ namespace simon {
   }
 
   void game_update(){
+
     switch (sim_state) {
+     case _simState_intro: // Play Sequence
+        if (_stateMDebug){ Serial.println("Intro"); }
+        process_intro();
+        break;
      case _simState_seq: // Play Sequence
         if (_stateMDebug){ Serial.println("Intro"); }
         process_seq();
@@ -145,14 +153,16 @@ namespace simon {
 
   void simon_reset(){
     if (_functionDebug) { Serial.println("Enter Init_intro"); }
-    sim_state=_simState_seq;
+    sim_state=_simState_intro;
     sim_currentUserStep = 0;
     sim_roundStep = 1;
     sim_misses = 0;
     generate_sequence();
+    init_intro();
   }
 
   void generate_sequence(){
+    if (_functionDebug) { Serial.println("Enter generate_sequence"); }
     randomSeed(long(currentTime));
     int row = int(mrandom(0,3));
     int col = int(mrandom(0,3));
@@ -176,14 +186,39 @@ namespace simon {
   }
 
       
+  void init_intro(){
+    if (_functionDebug) { Serial.println("Enter init_intro"); }
+    sim_state = _simState_intro;
+    sim_startTime = currentTime;
+    sim_endTime = sim_startTime + _sim_introDuration;
+  }
+
+  void process_intro(){
+    draw_all(0,0,0);
+    char s[] = "Simon";
+    unsigned long c1 = (currentTime/500) % 50;
+    int offset = -int(c1);
+    int i = 0;
+    while (s[i] != 0){
+      printChar(19,i*4+1,s[i],120,255,0);  
+      i++;
+    }
+    if (currentTime > sim_endTime){
+      init_seq();
+    }
+  }
+
   void init_seq(){
     if (_functionDebug) { Serial.println("Enter init_seq"); }
+    sim_state = _simState_seq;
     sim_startTime = currentTime;
     sim_endTime = 0;
   }
 
   void process_seq(){
-    draw_all(0,0,10);
+    if (_functionDebug) { Serial.println("Enter process_seq"); }
+    draw_all(0,0,0);
+    set_border(5,5,5);
     if (currentTime > sim_startTime + sim_roundStep*_sim_seqStepDuration) {
         init_wait();
       return; 
@@ -204,7 +239,9 @@ namespace simon {
   // this function will wait until the user is standing on the first square
   // 
   void process_wait(){
-    draw_all(0,10,0);
+    if (_functionDebug) { Serial.println("Enter process_wait"); }
+    draw_all(0,0,0);
+    set_border(5,5,5);
     if ((numberSquaresDown()==1) && (state[sim_seq[0][0]][sim_seq[0][1]] == _down)){
       draw_all(10,10,10);
       init_uGood();
@@ -217,7 +254,7 @@ namespace simon {
     int step = ((currentTime - sim_startTime) / 100) % 4;
     while (++p<16){
       if (p%4 == step){
-        set_pixel(x,y,0,255,0);
+        set_pixel(x,y,128,255,0);
       } else {
         set_pixel(x,y,0,0,255);
       }
@@ -241,12 +278,12 @@ namespace simon {
 
   // Check if the ones pressed are good
   void process_uGood(){
-    if (_functionDebug) { Serial.println("Enter uGood");}
-    draw_all(0,0,1);
-
+    if (_functionDebug) { Serial.println("Enter process uGood");}
+    draw_all(0,0,0);
+    set_border2(5,5,5);
     if (numberSquaresPressed()>1){
       drawBadSquare();
-//      init_uBad();
+      init_uBad();
       return;
     }
 
@@ -257,16 +294,20 @@ namespace simon {
       int col0 = sim_seq[sim_currentUserStep][1];
       if (state[row0][col0] == _pressed){
         draw_square(row0,col0,0,255,0);
-        if (sim_currentUserStep >= sim_roundStep) {
+        if (sim_currentUserStep >= sim_roundStep-1) {
           init_wSeq();
           return;
-        }  
+        }           
       } else {
         if (_stepDebug){ Serial.println("Pressed Wrong"); }
         drawBadSquare();
         init_uBad();
         return;
       }
+    } else {
+      draw_square(sim_seq[sim_currentUserStep][0],
+                  sim_seq[sim_currentUserStep][1],
+                  0,255,0);
     }
     return;
   }
@@ -296,7 +337,8 @@ namespace simon {
   }
 
   void process_uBad(){
-    draw_all(1,1,1);
+    draw_all(0,0,0);
+    set_border(5,5,5);
     if (currentTime-sim_startTime < (sim_endTime-sim_startTime)/2) { 
       // show the last step
       draw_square(badRow,badCol,128,0,0);
@@ -306,11 +348,6 @@ namespace simon {
     if (currentTime >= sim_endTime){
       init_seq();
     }
-  }
-
-  void drawBadStep(){
-    //board[sim_seq[sim_roundStep-1][0]][sim_seq[sim_roundStep-1][1]] = _white;
-    // board[badRow][badCol] = _red0;
   }
 
   void drawStrikes(int count){
@@ -359,11 +396,12 @@ namespace simon {
   void process_wGame(){
     drawWin();
     if (currentTime >= sim_endTime){
-      init_seq();
+      game_boot();
     }
   }
 
   void drawWin(){
+    step();
   }
 
   void init_lGame(){
@@ -373,25 +411,9 @@ namespace simon {
   }
 
   void process_lGame(){
-  //  setBoardToColor(_black);
-  /*  drawLose();
-    if (currentTime >= simTime_lGame){
-      init_intro();
-    }*/
-  }
-
-  void drawLose(){
-   /* for (int i=0; i<4; i++){
-      for (int j=0; j<4; j++){
-  //      setPalletteToColor(i,j,_black);
-      }
+    draw_all(255,0,0);
+    if (currentTime >= sim_endTime){
+      game_boot();
     }
-    drawStrikes(3);
-    for (int offset=-1; offset<=1; offset++){
-      for (int i=0; i<10; i++){
-        //if (i+offset+5 >= 5 && i+offset+5 <= 14) { pallette[i+offset+5][i+5]=_red1; }
-        //if (i+offset+5 >= 5 && i+offset+5 <= 14) { pallette[i+offset+5][9-i+5]=_red1;}
-      }
-    }*/
   }
 }

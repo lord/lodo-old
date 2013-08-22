@@ -67,6 +67,24 @@ void set_pixel_alpha(int x, int y, int r, int g, int b, float alpha) {
   }
 }
 
+void set_border(int r, int g, int b){
+  for (int i=0; i<20; i++){
+    set_pixel(0,i,r,g,b);
+    set_pixel(19,i,r,g,b);
+    set_pixel(i,0,r,g,b);
+    set_pixel(i,19,r,g,b);
+  }
+}
+
+void set_border2(int r, int g, int b){
+  for (int i=0; i<20; i=i+2){
+    set_pixel(0,i,r,g,b);
+    set_pixel(19,i,r,g,b);
+    set_pixel(i,0,r,g,b);
+    set_pixel(i,19,r,g,b);
+  }
+}
+
 int mrandom(int low, int high){
   int num = random(-10,10);
   while (num>high || num <low){ num = random(-10,10); }
