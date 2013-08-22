@@ -34,6 +34,11 @@ byte stateLast[4][4];
 int sensors[2][16];
 byte pallette[20][20][3];
 
+const byte _gameSelector = 0;
+const byte _simonGame = 1;
+const byte _pongGame = 2;
+byte currentGame = _gameSelector;
+
 // 
 // updates the board
 //
@@ -152,7 +157,7 @@ void printLights(){
 }
 
 void printSquare(int row, int col){
-  if (row==2 and col==2) { // accomodate bad wiring on 2,2
+  if (row==2 and col==2) { // accommodate bad wiring on 2,2
     for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+0);}
     for (int l=0;l<5;l++)  {printPixel(row*5+l,col*5+1);}
     for (int l=4;l>=0;l--) {printPixel(row*5+l,col*5+2);}

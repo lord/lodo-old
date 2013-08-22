@@ -9,8 +9,8 @@
 namespace pongGame {
 
   void game_boot();
-  void game_update(int);
-  void game_draw(int);
+  void game_update();
+  void game_draw();
   void draw_background();
   void draw_players();
   void update_ball();
@@ -49,14 +49,14 @@ namespace pongGame {
     reset_game();
   }
 
-  void game_update(int time) {
+  void game_update() {
     // if (gameMode == _playingMode) {
       update_players();
       update_ball();
     // } else if ()
   }
 
-  void game_draw(int time) {
+  void game_draw() {
     draw_background();
     draw_players();
     draw_ball(ball_x, ball_y,0,255,0);
