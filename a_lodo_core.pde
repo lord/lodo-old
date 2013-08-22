@@ -4,7 +4,7 @@
 
 const boolean debug = 0;
 const boolean outputSensors = 0;
-const boolean _functionDebug = 0;
+const boolean _functionDebug = 1;
 const boolean _stateMDebug = 0;
 const boolean _checkBoard = 0;
 

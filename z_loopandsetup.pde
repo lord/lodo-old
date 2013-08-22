@@ -21,22 +21,24 @@ void setup() {
   pinMode(5, OUTPUT);
   Serial.begin(9600);
   randomSeed(analogRead(4)); // setup for a different starting point for the random number 
-  pongGame::game_boot();
+//  pongGame::game_boot();
+  simon::game_boot();
 }
 
 void loop() {
   currentTime = millis();
-  if (currentTime >= displayTime) {
-    fire();
+/*  if (currentTime >= displayTime) {
+ //   fire();
  //   pongGame::game_draw(currentTime - displayTime);
+    simon::game_draw(currentTime - displayTime);
  //   printText();
-    printLights();
     displayTime = currentTime + _lodo_drawPoll;
-  }
+  }*/
   if (currentTime >= lodo_updateTime) {
     updateBoard();
-    pongGame::game_update(currentTime - lodo_updateTime);
+    simon::gameUpdate();
     lodo_updateTime = currentTime + _lodo_updatePoll;
+    printLights();
   } 
 }
 
