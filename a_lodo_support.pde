@@ -14,6 +14,15 @@ void draw_square(int x, int y, int r, int g, int b) {
   }
 }
 
+
+void draw_square_alpha(int x, int y, int r, int g, int b, float alpha) {
+  for (int i=0; i<5; i++){
+    for (int j=0; j<5; j++){
+      set_pixel_alpha(5*x+i,5*y+j,r,g,b,alpha);
+    }
+  }
+}
+
 // draws a non antialiased filled rect with upper left corner x, y & width w and height h
 void draw_rectangle(int x, int y, int w, int h, int r, int g, int b) {
   for (int i=0; i<w; i++) {
