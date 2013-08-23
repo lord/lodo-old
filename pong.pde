@@ -20,6 +20,9 @@ namespace pongGame {
   void draw_paddle(float, float, int, int, int);
   void reset_ball();
   void reset_game();
+  void draw_score();
+  void draw_flash();
+  void draw_win();
   float get_ball_bounce_dir(float,bool);
   float get_paddle_speed(float);
 
@@ -29,11 +32,16 @@ namespace pongGame {
   float ball_y;
   float ball_vel;
   float ball_dir;
+  int player1_score;
+  int player2_score;
+  float player1_flash;
+  float player2_flash;
+  int gameTimer;
 
   int gameMode;
   const int _playingMode = 1;
-  const int _player1WinMode = 2;
-  const int _player2WinMode = 3;
+  const int _scoreMode = 2;
+  const int _winMode = 3;
 
   const float _paddle_speed_power = 0.8; 
   const float _paddle_speed_multiplier = 0.2;
@@ -44,22 +52,43 @@ namespace pongGame {
 
   const float _ball_start_speed = 0.13;
   const float _ball_speedup = 0.04;
+  const int _winning_score = 5;
+  const float _flash_speed = 0.05;
 
   void game_boot() {
     reset_game();
   }
 
   void game_update() {
-    // if (gameMode == _playingMode) {
-      update_players();
+    update_players();
+    if (gameMode == _playingMode) {
       update_ball();
-    // } else if ()
+    }
+    if (player1_flash > _flash_speed) {player1_flash -= _flash_speed;} else {player1_flash=0;}
+    if (player2_flash > _flash_speed) {player2_flash -= _flash_speed;} else {player2_flash=0;}
+    if (gameTimer > 0) {gameTimer--;}
+    if (gameMode == _scoreMode and gameTimer == 0) {
+      reset_ball();
+      gameMode = _playingMode;
+    }
+    if (gameMode == _winMode and gameTimer == 0) {
+      reset_game();
+    }
   }
 
   void game_draw() {
-    draw_background();
-    draw_players();
-    draw_ball(ball_x, ball_y,0,255,0);
+    if (gameMode == _winMode) {
+      if (gameTimer % 10 == 0) {draw_win();}
+    } else {
+      draw_background();
+      set_border(1,1,1);
+      draw_score();
+      draw_players();
+      if (gameMode == _playingMode) {
+        draw_ball(ball_x, ball_y,0,255,0);
+      }
+      draw_flash();
+    }
   }
 
   void draw_background() {
@@ -89,6 +118,34 @@ namespace pongGame {
     set_pixel_alpha(drawx+1,drawy+1,r,g,b,1 - point_distance(1,1,extrax,extray));
   }
 
+  void draw_score() {
+    draw_rectangle(0,0,1,(_boardWidth+1)/_winning_score*player1_score,255,0,0);
+    draw_rectangle(_boardWidth,0,1,(_boardWidth+1)/_winning_score*player2_score,0,0,255);
+  }
+
+  void draw_flash() {
+    if (player1_flash > 0) {
+      draw_square_alpha(0,0,0,0,255,player1_flash);
+      draw_square_alpha(0,1,0,0,255,player1_flash);
+      draw_square_alpha(0,2,0,0,255,player1_flash);
+      draw_square_alpha(0,3,0,0,255,player1_flash);
+      draw_square_alpha(1,0,0,0,255,player1_flash);
+      draw_square_alpha(1,1,0,0,255,player1_flash);
+      draw_square_alpha(1,2,0,0,255,player1_flash);
+      draw_square_alpha(1,3,0,0,255,player1_flash);
+    }
+    if (player2_flash > 0) {
+      draw_square_alpha(3,0,255,0,0,player2_flash);
+      draw_square_alpha(3,1,255,0,0,player2_flash);
+      draw_square_alpha(3,2,255,0,0,player2_flash);
+      draw_square_alpha(3,3,255,0,0,player2_flash);
+      draw_square_alpha(2,0,255,0,0,player2_flash);
+      draw_square_alpha(2,1,255,0,0,player2_flash);
+      draw_square_alpha(2,2,255,0,0,player2_flash);
+      draw_square_alpha(2,3,255,0,0,player2_flash);
+    }
+  }
+
   // gets the ball bounce direction
   // relative_y is the distance from the top of the paddle
   float get_ball_bounce_dir(float relative_y, bool player2) {
@@ -101,6 +158,22 @@ namespace pongGame {
 
   float get_paddle_speed(float distance) {
     return pow(abs(distance), _paddle_speed_power) * _paddle_speed_multiplier;
+  }
+
+  void draw_win() {
+    if (player1_score > player2_score) {
+      for (int i=0;i<4;i++) {
+        for (int j=0;j<4;j++) {
+          draw_square(i,j,random(0,255),random(0,1),random(0,1));
+        }
+      }
+    } else {
+      for (int i=0;i<4;i++) {
+        for (int j=0;j<4;j++) {
+          draw_square(i,j,random(0,1),random(0,1),random(0,255));
+        }
+      }
+    }
   }
 
   void update_players() {
@@ -162,7 +235,12 @@ namespace pongGame {
   void reset_game() {
     player1_y = 7.5;
     player2_y = 7.5;
+    player1_score = 0;
+    player2_score = 0;
+    player1_flash = 0;
+    player2_flash = 0;
     gameMode = _playingMode;
+    gameTimer = 0;
     reset_ball();
   }
 
@@ -173,17 +251,31 @@ namespace pongGame {
 
     // reset if behind a player
     if (ball_x < 0) {
+      player2_score++;
+      player1_flash = 1.0;
+      gameMode = _scoreMode;
+      gameTimer = 50;
       reset_ball();
     } else if (ball_x > _boardWidth) {
+      player1_score++;
+      player2_flash = 1.0;
+      gameMode = _scoreMode;
+      gameTimer = 50;
       reset_ball();
     }
 
+    // did that score just win? enter win mode
+    if (player1_score >= _winning_score or player2_score >= _winning_score) {
+      gameMode = _winMode;
+      gameTimer = 350;
+    }
+
     // bounce off walls
-    if (ball_y < 0) {
-      ball_y = 0;
+    if (ball_y < 1) {
+      ball_y = 1;
       ball_dir *= -1;
-    } else if (ball_y > _boardWidth) {
-      ball_y = _boardWidth;
+    } else if (ball_y > _boardWidth - 1) {
+      ball_y = _boardWidth - 1;
       ball_dir *= -1;
     }
 
