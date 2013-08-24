@@ -4,7 +4,7 @@
 
 const boolean debug = 0;
 const boolean outputSensors = 0;
-const boolean _functionDebug = 1;
+const boolean _functionDebug = 0;
 const boolean _stateMDebug = 0;
 const boolean _checkBoard = 0;
 
@@ -26,7 +26,7 @@ unsigned long displayTime = 0;
 unsigned long currentTime = 0;
 unsigned long lodo_updateTime = 0;
 unsigned long lodo_lastPressureTime = 0; // the last time someone stepped on the board.
-const unsigned long _lodo_lastPressureTimeout = 1000;
+const unsigned long _lodo_lastPressureTimeout = 10000;  // how soon to start the screen saver
 
 byte state[4][4];
 byte stateLast[4][4];
@@ -37,6 +37,7 @@ byte pallette[20][20][3];
 const byte _gameSelector = 0;
 const byte _simonGame = 1;
 const byte _pongGame = 2;
+const byte _dance = 3;
 byte currentGame = _gameSelector;
 
 // 
@@ -51,8 +52,8 @@ void updateBoard(){
   updateSensors();
   if (sensors[0][14] > _sensorThreshold || sensors[0][15] > _sensorThreshold) { state[0][0]=_down; } else { state[0][0] = _up; }
   if (sensors[0][10] > _sensorThreshold || sensors[0][11] > _sensorThreshold ) { state[0][1]=_down; } else { state[0][1] = _up; }
-  if (sensors[0][6] > _sensorThreshold || sensors[0][7] > _sensorThreshold ) { state[0][2]=_down; } else { state[0][2] = _up; }
-  if (sensors[0][2] > _sensorThreshold || sensors[0][3] > _sensorThreshold ) { state[0][3]=_down; } else { state[0][3] = _up; }
+  if (sensors[0][6] > _sensorThreshold || sensors[0][7] > _sensorThreshold )  { state[0][2]=_down; } else { state[0][2] = _up; }
+  if (sensors[0][2] > _sensorThreshold || sensors[0][3] > _sensorThreshold )  { state[0][3]=_down; } else { state[0][3] = _up; }
 
   if (sensors[0][0] > _sensorThreshold || sensors[0][1] > _sensorThreshold ) { state[1][0]=_down; } else { state[1][0] = _up; }
   if (sensors[0][4] > _sensorThreshold || sensors[0][5] > _sensorThreshold ) { state[1][1]=_down; } else { state[1][1] = _up; }

@@ -9,6 +9,9 @@ void drawCurrentGame() {
     case _pongGame:
       pongGame::game_draw();
       break;
+    case _dance:
+      dance::game_draw();
+      break;
   }
 }
 
@@ -22,6 +25,9 @@ void updateCurrentGame() {
       break;
     case _pongGame:
       pongGame::game_update();
+      break;
+    case _dance:
+      dance::game_update();
       break;
   }
 }
@@ -61,5 +67,8 @@ void loop() {
     drawCurrentGame();
     printLights();
   } 
+  if (currentTime > lodo_lastPressureTime + _lodo_lastPressureTimeout){
+    gameSelector::start_saver();
+  }
 }
 

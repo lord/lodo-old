@@ -36,11 +36,11 @@ namespace simon {
   unsigned long sim_startTime = 0;
   unsigned long sim_endTime = 0;
   const unsigned long _sim_seqStepDuration = 1000; // how long to display each sequare
-  const unsigned long _sim_badSquareDuration = 1000; // how long to display a mistep
+  const unsigned long _sim_badSquareDuration = 3000; // how long to display a mistep
   const unsigned long _sim_winGameDuration = 15000;
   const unsigned long _sim_loseGameDuration = 6000;
   const unsigned long _sim_winSeqDuration = 1000;
-  const unsigned long _sim_introDuration = 10000;
+  const unsigned long _sim_introDuration = 3000;
 
   //Simon Variables
   byte sim_seq[16][2]={{0,0},{0,1},{1,1},{2,1},{3,0},{3,1},{3,0},{2,1},{1,1},{1,2},{0,2},{1,2},{2,3},{3,3},{2,2},{1,1}};
@@ -73,9 +73,9 @@ namespace simon {
   void init_uBad();
   void process_uBad();
   void drawBadStep();
-  void drawStrikes(int strikeCount);
+  void drawStrikes(byte strikeCount);
   void setCorners();
-  void d_X(int pRow, int pCol, int fg);
+  void draw_X(int pRow, int pCol);
   void d_square(int x, int y, int side, int color);
   void d_rect(int x, int y, int dx, int dy, int color);
   void init_wSeq();
@@ -91,6 +91,7 @@ namespace simon {
   void draw();
   void setPalletteToArrow(int row, int col, int arrowType);
   void simon_reset();
+  void step();
 
   const boolean _functionDebug = 0;
   const boolean _stateMDebug = 0;
@@ -182,9 +183,11 @@ namespace simon {
       }
       sim_seq[i][0] = row; sim_seq[i][1] = col;
       if (col<0 || col >3 || row<0 || row>3) { i--; row=sim_seq[i][0]; col=sim_seq[i][1];} // repeat if out of bounds
+      if (i>1 and (sim_seq[i][0]==sim_seq[i-2][0] and sim_seq[i][1]==sim_seq[i-2][1])) {
+        i--; row=sim_seq[i][0]; col=sim_seq[i][1];
+      } // repeat if n-2 = n so that debouncing will work better.
     }
   }
-
       
   void init_intro(){
     if (_functionDebug) { Serial.println("Enter init_intro"); }
@@ -242,7 +245,7 @@ namespace simon {
     if (_functionDebug) { Serial.println("Enter process_wait"); }
     draw_all(0,0,0);
     set_border(5,5,5);
-    if ((numberSquaresDown()==1) && (state[sim_seq[0][0]][sim_seq[0][1]] == _down)){
+    if ((numberSquaresDownOrPressed()==1) && (state[sim_seq[0][0]][sim_seq[0][1]] == _pressed)){
       draw_all(10,10,10);
       init_uGood();
       return;
@@ -272,7 +275,6 @@ namespace simon {
     sim_startTime = currentTime;
     sim_endTime = 0;
     sim_currentUserStep = -1;
-    state[sim_seq[0][0]][sim_seq[0][1]] = _pressed;
     process_uGood();  // needed to keep from losing the first press
   }
 
@@ -288,7 +290,16 @@ namespace simon {
     }
 
     // check to see if pressed advances pointer
-    if (numberSquaresPressed()==1) {
+    if (numberSquaresPressed()==1){
+      if (state[sim_seq[sim_currentUserStep][0]][sim_seq[sim_currentUserStep][1]]==_pressed){ // same square bouncing
+        draw_square(sim_seq[sim_currentUserStep][0], sim_seq[sim_currentUserStep][1], 0, 255, 0);
+        return;
+      }
+      if (sim_currentUserStep > 0 &&
+          state[sim_seq[sim_currentUserStep-1][0]][sim_seq[sim_currentUserStep-1][1]]==_pressed){ // stepping to new square & bouncing on old
+        draw_square(sim_seq[sim_currentUserStep][0],sim_seq[sim_currentUserStep][1],0,255,0);
+        return;
+      }
       sim_currentUserStep++;
       int row0 = sim_seq[sim_currentUserStep][0];
       int col0 = sim_seq[sim_currentUserStep][1];
@@ -330,10 +341,7 @@ namespace simon {
     sim_state=_simState_uBad;
     sim_startTime = currentTime;
     sim_endTime = sim_startTime + _sim_badSquareDuration;
-    if (++sim_misses >= _sim_maxMisses){
-      // you lose!!
-      init_lGame();
-    }
+    sim_misses++;
   }
 
   void process_uBad(){
@@ -346,24 +354,36 @@ namespace simon {
       drawStrikes(sim_misses);
     }
     if (currentTime >= sim_endTime){
-      init_seq();
+      if (sim_misses >= _sim_maxMisses){
+        init_lGame();
+      } else {
+        init_seq();
+      }
     }
   }
 
-  void drawStrikes(int count){
-    draw_square(3,0,255,255,255);
-    draw_square(3,1,255,255,255);
-    draw_square(3,2,255,255,255);
-    if (count >= 1){ 
-      draw_square(3,0,255,0,0);
+  void drawStrikes(byte count){
+      draw_square(3,0,0,0,0);
+      draw_square(3,1,0,0,0);
+      draw_square(3,2,0,0,0);
+      if (count >= 1){ 
+        draw_X(3,0);
+      }
+      if (count >= 2){ 
+        draw_X(3,1);
+      }
+      if (count >= 3){ 
+        draw_X(3,2);
+      }
     }
-    if (count >= 2){ 
-      draw_square(3,1,255,0,0);
+  
+    void draw_X(int row, int col){
+      set_pixel(row*5+0, col*5+0, 255,0,0); set_pixel(row*5+0, col*5+4, 255,0,0);
+      set_pixel(row*5+1, col*5+1, 255,0,0); set_pixel(row*5+1, col*5+3, 255,0,0);
+      set_pixel(row*5+2, col*5+2, 255,0,0); 
+      set_pixel(row*5+3, col*5+1, 255,0,0); set_pixel(row*5+3, col*5+3, 255,0,0);
+      set_pixel(row*5+4, col*5+0, 255,0,0); set_pixel(row*5+4, col*5+4, 255,0,0);
     }
-    if (count >= 3){ 
-      draw_square(3,2,255,0,0);
-    }
-  }
   
   void init_wSeq(){
     sim_state=_simState_wSeq;
@@ -401,7 +421,21 @@ namespace simon {
   }
 
   void drawWin(){
-    step();
+    if (_functionDebug) { Serial.println("Entering Step"); }
+    for (int row=0; row<4; row++){
+      for (int col=0; col<4; col++){
+        int r = random(3000);
+        int g = random(300);
+        int b = random(300);
+        if (r < 200){
+      for (int i=0; i<5; i++){
+        for (int j=0; j<5; j++){
+          set_pixel(row*5+i, col*5+j,r,g,b);
+        }
+      }
+        }
+      }
+    }
   }
 
   void init_lGame(){
