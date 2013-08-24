@@ -15,9 +15,21 @@ void draw_square(int x, int y, int r, int g, int b) {
 }
 
 
-// draws a filled rectangle somewhere on the pixel grid
-void draw_rectangle(float x1, float y1, float x2, float y2, int r, int g, int b) {
-  // implement this
+void draw_square_alpha(int x, int y, int r, int g, int b, float alpha) {
+  for (int i=0; i<5; i++){
+    for (int j=0; j<5; j++){
+      set_pixel_alpha(5*x+i,5*y+j,r,g,b,alpha);
+    }
+  }
+}
+
+// draws a non antialiased filled rect with upper left corner x, y & width w and height h
+void draw_rectangle(int x, int y, int w, int h, int r, int g, int b) {
+  for (int i=0; i<w; i++) {
+    for (int j=0; j<h; j++) {
+      set_pixel(x+i,y+j,r,g,b);
+    }
+  }
 }
 
 // floods the entire board with a color
